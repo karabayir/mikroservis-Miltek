@@ -1,7 +1,12 @@
 package com.kodlamaio.inventoryservice;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+
+import com.kodlamaio.common.utilities.mapper.ModelMapperManager;
+import com.kodlamaio.common.utilities.mapper.ModelMapperService;
 
 @SpringBootApplication
 public class InventoryServiceApplication {
@@ -10,4 +15,13 @@ public class InventoryServiceApplication {
 		SpringApplication.run(InventoryServiceApplication.class, args);
 	}
 
+	@Bean
+	public ModelMapper getModelMapper() {
+		return new ModelMapper();
+	}
+	
+	@Bean
+	public ModelMapperService getModelMapperService(ModelMapper mapper) {
+		return new ModelMapperManager(mapper);
+	}
 }
