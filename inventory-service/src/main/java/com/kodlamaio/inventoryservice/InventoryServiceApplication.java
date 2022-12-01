@@ -5,8 +5,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
-
-import com.kodlamaio.common.events.RentalCreatedEvent;
 import com.kodlamaio.common.utilities.mapper.ModelMapperManager;
 import com.kodlamaio.common.utilities.mapper.ModelMapperService;
 
@@ -28,8 +26,5 @@ public class InventoryServiceApplication {
 		return new ModelMapperManager(mapper);
 	}
 	
-	@Bean
-	public RentalCreatedEvent getRentalCreatedEvent() {
-		return new RentalCreatedEvent();
-	}
+	
 }

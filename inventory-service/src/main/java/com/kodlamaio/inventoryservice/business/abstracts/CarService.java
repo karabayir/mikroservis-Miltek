@@ -20,4 +20,6 @@ public interface CarService {
 	UpdateCarResponse update(UpdateCarRequest request);
 	
 	void deleteById(String id);
+	
+	void changeCarState(String id);
 }

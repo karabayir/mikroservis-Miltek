@@ -13,8 +13,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateRentalRequest {
+public class UpdateRentalRequest {
 
+	@NotBlank
+	@NotNull
+	private String id;
+	
 	@NotBlank
 	@NotNull
 	private String carId;

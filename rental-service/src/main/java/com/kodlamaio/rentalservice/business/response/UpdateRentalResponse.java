@@ -11,8 +11,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetAllRentalsResponse {
-	
+public class UpdateRentalResponse {
+
 	private String id;
 	private String carId;
 	private LocalDateTime dateStarted;

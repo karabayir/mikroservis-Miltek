@@ -28,8 +28,4 @@ public class RentalServiceApplication {
 		return new ModelMapperManager(mapper);
 	}
 	
-	@Bean
-	public RentalCreatedEvent getRentalCreatedEvent() {
-		return new RentalCreatedEvent();
-	}
 }

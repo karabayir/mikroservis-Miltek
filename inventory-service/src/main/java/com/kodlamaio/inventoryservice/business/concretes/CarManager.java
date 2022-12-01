@@ -16,6 +16,7 @@ import com.kodlamaio.inventoryservice.business.responses.get.GetAllCarsResponse;
 import com.kodlamaio.inventoryservice.business.responses.get.GetCarResponse;
 import com.kodlamaio.inventoryservice.business.responses.update.UpdateCarResponse;
 import com.kodlamaio.inventoryservice.entities.Car;
+import com.kodlamaio.inventoryservice.entities.CarState;
 import com.kodlamaio.inventoryservice.repository.CarRepository;
 
 import lombok.AllArgsConstructor;
@@ -69,6 +70,14 @@ public class CarManager implements CarService {
 	public void deleteById(String id) {
 		checkIfCarExistById(id);
 		carRepository.deleteById(id);	
+	}
+	
+	@Override
+	public void changeCarState(String id) {
+		checkIfCarExistById(id);
+		Car car = carRepository.getCarById(id);
+		car.setState(CarState.NOT_AVAILABLE);
+		carRepository.save(car);
 	}
 	
 	private void checkIfCarExistById(String id) {
