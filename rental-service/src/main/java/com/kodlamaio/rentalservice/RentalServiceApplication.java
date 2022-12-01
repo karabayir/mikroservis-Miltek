@@ -1,4 +1,4 @@
-package com.kodlamaio.inventoryservice;
+package com.kodlamaio.rentalservice;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
@@ -12,10 +12,10 @@ import com.kodlamaio.common.utilities.mapper.ModelMapperService;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-public class InventoryServiceApplication {
+public class RentalServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(InventoryServiceApplication.class, args);
+		SpringApplication.run(RentalServiceApplication.class, args);
 	}
 
 	@Bean
