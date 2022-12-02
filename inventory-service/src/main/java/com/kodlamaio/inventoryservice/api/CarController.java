@@ -40,6 +40,11 @@ public class CarController {
 		return carService.getById(id);
 	}
 	
+	@GetMapping("getCarStateById/{id}")
+	void checkIfCarAvailable(String id) {
+		carService.checkIfCarAvailable(id);
+	}
+	
 	@PostMapping("add")
 	CreateCarResponse add(@Valid @RequestBody CreateCarRequest request) {
 		return carService.add(request);

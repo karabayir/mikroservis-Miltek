@@ -16,6 +16,7 @@ import com.kodlamaio.rentalservice.business.response.CreateRentalResponse;
 import com.kodlamaio.rentalservice.business.response.GetAllRentalsResponse;
 import com.kodlamaio.rentalservice.business.response.GetRentalResponse;
 import com.kodlamaio.rentalservice.business.response.UpdateRentalResponse;
+import com.kodlamaio.rentalservice.client.CarServiceClient;
 import com.kodlamaio.rentalservice.entities.Rental;
 import com.kodlamaio.rentalservice.kafka.RentalProducer;
 import com.kodlamaio.rentalservice.repository.RentalRepository;
@@ -29,6 +30,7 @@ public class RentalManager implements RentalService {
 	private final RentalRepository rentalRepository;
 	private final ModelMapperService mapperService;
 	private final RentalProducer  rentalProducer;
+	private final CarServiceClient carServiceClient;
 
 	@Override
 	public List<GetAllRentalsResponse> getAll() {
@@ -49,6 +51,7 @@ public class RentalManager implements RentalService {
 	@Override
 	public CreateRentalResponse add(CreateRentalRequest request) {
 		checkIfExistsRentalByCarId(request.getCarId());
+		carServiceClient.checkIfCarAvailable(request.getCarId());
 		Rental rental = mapperService.forRequest().map(request, Rental.class);
 		rentalRepository.save(rental);
 			

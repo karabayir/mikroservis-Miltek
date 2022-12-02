@@ -92,6 +92,14 @@ public class CarManager implements CarService {
 		carRepository.save(newCar);
 	}
 	
+	@Override
+	public void checkIfCarAvailable(String id) {
+		checkIfCarExistById(id);
+		Car car = carRepository.getCarById(id);
+		if(car.getState().equals(CarState.NOT_AVAILABLE))
+			throw new BusinessException("Car Not Available");
+	}
+	
 	private void checkIfCarExistById(String id) {
 		if(carRepository.getCarById(id) == null)
 			throw new BusinessException(id+" Car Not Exist");
@@ -101,6 +109,8 @@ public class CarManager implements CarService {
 		if(carRepository.existsCarByPlate(name))
 			throw new BusinessException("Car Exist");
 	}
+
+	
 
 	
 

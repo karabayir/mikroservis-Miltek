@@ -24,4 +24,6 @@ public interface CarService {
 	void changeCarState(String id);
 	
 	void changeCarState(String oldCarId, String newCarId);
+	
+	void checkIfCarAvailable(String id);
 }
