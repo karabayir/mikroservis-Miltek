@@ -22,4 +22,6 @@ public interface CarService {
 	void deleteById(String id);
 	
 	void changeCarState(String id);
+	
+	void changeCarState(String oldCarId, String newCarId);
 }

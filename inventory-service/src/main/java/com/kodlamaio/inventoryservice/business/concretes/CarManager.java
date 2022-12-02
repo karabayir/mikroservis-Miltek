@@ -80,6 +80,18 @@ public class CarManager implements CarService {
 		carRepository.save(car);
 	}
 	
+	@Override
+	public void changeCarState(String oldCarId, String newCarId) {
+		checkIfCarExistById(oldCarId);
+		checkIfCarExistById(newCarId);
+		Car oldCar = carRepository.getCarById(oldCarId);
+		Car newCar = carRepository.getCarById(newCarId);
+		oldCar.setState(CarState.AVAILABLE);
+		newCar.setState(CarState.NOT_AVAILABLE);
+		carRepository.save(oldCar);
+		carRepository.save(newCar);
+	}
+	
 	private void checkIfCarExistById(String id) {
 		if(carRepository.getCarById(id) == null)
 			throw new BusinessException(id+" Car Not Exist");
@@ -89,6 +101,8 @@ public class CarManager implements CarService {
 		if(carRepository.existsCarByPlate(name))
 			throw new BusinessException("Car Exist");
 	}
+
+	
 
 	
 	

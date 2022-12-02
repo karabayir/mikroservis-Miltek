@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.kodlamaio.common.events.RentalCreatedEvent;
+import com.kodlamaio.common.events.RentalUpdatedCarEvent;
 import com.kodlamaio.common.utilities.exception.BusinessException;
 import com.kodlamaio.common.utilities.mapper.ModelMapperService;
 import com.kodlamaio.rentalservice.business.abstracts.RentalService;	
@@ -63,8 +64,16 @@ public class RentalManager implements RentalService {
 	@Override
 	public UpdateRentalResponse update(UpdateRentalRequest request) {
 		checkIfRentalExists(request.getId());
+		Rental rentalOld= rentalRepository.getRentalById(request.getId());
 		Rental rental = mapperService.forRequest().map(request, Rental.class);
-		rentalRepository.save(rental);
+		rentalRepository.save(rental);	
+		
+		RentalUpdatedCarEvent rentalUpdatedCarEvent = new RentalUpdatedCarEvent();
+		rentalUpdatedCarEvent.setOldCarId(rentalOld.getCarId());
+		rentalUpdatedCarEvent.setNewCarId(rental.getCarId());
+		
+		rentalProducer.sendMessage(rentalUpdatedCarEvent);
+		
 		return mapperService.forResponse().map(rental, UpdateRentalResponse.class);
 	}
 

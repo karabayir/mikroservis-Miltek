@@ -10,6 +10,7 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
 import com.kodlamaio.common.events.RentalCreatedEvent;
+import com.kodlamaio.common.events.RentalUpdatedCarEvent;
 
 import lombok.AllArgsConstructor;
 
@@ -20,8 +21,9 @@ public class RentalProducer {
 	  private static final Logger LOGGER = LoggerFactory.getLogger(RentalProducer.class);
 
 	    private final NewTopic topic;
-	    private final  KafkaTemplate<String, RentalCreatedEvent> kafkaTemplate;
-
+	    private final KafkaTemplate<String, RentalCreatedEvent> kafkaTemplate;
+	    private final KafkaTemplate<String, RentalUpdatedCarEvent> kafkaTemplate2;
+	    
 	    public void sendMessage(RentalCreatedEvent rentalCreatedEvent) {
 	        LOGGER.info(String.format("Rental created event => %s", rentalCreatedEvent.toString()));
 
@@ -30,6 +32,16 @@ public class RentalProducer {
 	                .setHeader(KafkaHeaders.TOPIC, topic.name()).build();
 	        
 	        kafkaTemplate.send(message);
+	    }
+	    
+	    public void sendMessage(RentalUpdatedCarEvent rentalUpdatedCarEvent){
+	    	LOGGER.info(String.format("Rental updated car event => %s", rentalUpdatedCarEvent.toString()));
+	    	Message<RentalUpdatedCarEvent> message= MessageBuilder
+	    			.withPayload(rentalUpdatedCarEvent)
+	    			.setHeader(KafkaHeaders.TOPIC, topic.name())
+	    			.build();
+	    	
+	    	kafkaTemplate2.send(message);
 	    }
  }
 
