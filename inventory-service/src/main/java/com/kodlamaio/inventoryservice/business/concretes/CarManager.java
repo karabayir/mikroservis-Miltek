@@ -1,6 +1,7 @@
 package com.kodlamaio.inventoryservice.business.concretes;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -17,6 +18,8 @@ import com.kodlamaio.inventoryservice.business.responses.get.GetCarResponse;
 import com.kodlamaio.inventoryservice.business.responses.update.UpdateCarResponse;
 import com.kodlamaio.inventoryservice.entities.Car;
 import com.kodlamaio.inventoryservice.entities.CarState;
+import com.kodlamaio.inventoryservice.entities.filter.CarFilter;
+import com.kodlamaio.inventoryservice.repository.CarFilterRepository;
 import com.kodlamaio.inventoryservice.repository.CarRepository;
 
 import lombok.AllArgsConstructor;
@@ -28,6 +31,7 @@ public class CarManager implements CarService {
 	private final CarRepository carRepository;
 	private final ModelMapperService mapperService;
 	private final ModelService modelService;
+	private final CarFilterRepository carFilterRepository;
 
 	@Override
 	public List<GetAllCarsResponse> getAll() {
@@ -47,11 +51,20 @@ public class CarManager implements CarService {
 
 	@Override
 	public CreateCarResponse add(CreateCarRequest request) {
+		
 		checkIfCarExistByPlate(request.getPlate());
 		modelService.checkIfModelExistById(request.getModelId());
+		
 		Car car = mapperService.forRequest().map(request, Car.class);
+		car.setId(UUID.randomUUID().toString());
 		carRepository.save(car);
+		
 		CreateCarResponse response = mapperService.forResponse().map(car, CreateCarResponse.class);
+		
+		
+		CarFilter carFilter = mapperService.forRequest().map(response, CarFilter.class);
+		carFilterRepository.insert(carFilter);
+		
 		return response;
 	}
 
