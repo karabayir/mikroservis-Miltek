@@ -18,7 +18,8 @@ import com.kodlamaio.rentalservice.business.response.GetRentalResponse;
 import com.kodlamaio.rentalservice.business.response.UpdateRentalResponse;
 import com.kodlamaio.rentalservice.client.CarServiceClient;
 import com.kodlamaio.rentalservice.entities.Rental;
-import com.kodlamaio.rentalservice.kafka.RentalProducer;
+import com.kodlamaio.rentalservice.kafka.RentalCreateProducer;
+import com.kodlamaio.rentalservice.kafka.RentalUpdateProducer;
 import com.kodlamaio.rentalservice.repository.RentalRepository;
 
 import lombok.AllArgsConstructor;
@@ -29,7 +30,8 @@ public class RentalManager implements RentalService {
 	
 	private final RentalRepository rentalRepository;
 	private final ModelMapperService mapperService;
-	private final RentalProducer  rentalProducer;
+	private final RentalCreateProducer  rentalCreateProducer;
+	private final RentalUpdateProducer rentalUpdateProducer;
 	private final CarServiceClient carServiceClient;
 
 	@Override
@@ -59,7 +61,7 @@ public class RentalManager implements RentalService {
         rentalCreatedEvent.setCarId(rental.getCarId());
         rentalCreatedEvent.setMessage("Rental Created");
   
-       rentalProducer.sendMessage(rentalCreatedEvent);
+       rentalCreateProducer.sendMessage(rentalCreatedEvent);
 		 
 		return mapperService.forResponse().map(rental, CreateRentalResponse.class);
 	}
@@ -75,7 +77,7 @@ public class RentalManager implements RentalService {
 		rentalUpdatedCarEvent.setOldCarId(rentalOld.getCarId());
 		rentalUpdatedCarEvent.setNewCarId(rental.getCarId());
 		
-		rentalProducer.sendMessage(rentalUpdatedCarEvent);
+		rentalUpdateProducer.sendMessage(rentalUpdatedCarEvent);
 		
 		return mapperService.forResponse().map(rental, UpdateRentalResponse.class);
 	}
