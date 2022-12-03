@@ -40,7 +40,7 @@ public class CarController {
 		return carService.getById(id);
 	}
 	
-	@GetMapping("getCarStateById/{id}")
+	@GetMapping("checkIfCarAvailable/{id}")
 	void checkIfCarAvailable(String id) {
 		carService.checkIfCarAvailable(id);
 	}
