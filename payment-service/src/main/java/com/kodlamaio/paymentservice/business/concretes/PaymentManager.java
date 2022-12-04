@@ -38,7 +38,6 @@ public class PaymentManager implements PaymentService{
 
 	@Override
 	public CreatePaymentResponse add(CreatePaymentRequest request) {
-		checkBalanceEnough(request.getCardBalance(), request.getTotalPrice());
 		Payment payment=mapperService.forRequest().map(request, Payment.class);
 		payment.setId(UUID.randomUUID().toString());
 		payment.setPaymentStatus(PaymentStatus.ONAY);
