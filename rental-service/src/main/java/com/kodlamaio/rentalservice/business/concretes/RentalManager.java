@@ -1,10 +1,12 @@
 package com.kodlamaio.rentalservice.business.concretes;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.kodlamaio.common.events.PaymentCreatedEvent;
 import com.kodlamaio.common.events.RentalCreatedEvent;
 import com.kodlamaio.common.events.RentalUpdatedCarEvent;
 import com.kodlamaio.common.utilities.exception.BusinessException;
@@ -17,6 +19,7 @@ import com.kodlamaio.rentalservice.business.response.GetAllRentalsResponse;
 import com.kodlamaio.rentalservice.business.response.GetRentalResponse;
 import com.kodlamaio.rentalservice.business.response.UpdateRentalResponse;
 import com.kodlamaio.rentalservice.client.CarServiceClient;
+import com.kodlamaio.rentalservice.client.PaymentServiceClient;
 import com.kodlamaio.rentalservice.entities.Rental;
 import com.kodlamaio.rentalservice.kafka.RentalCreateProducer;
 import com.kodlamaio.rentalservice.kafka.RentalUpdateProducer;
@@ -33,6 +36,7 @@ public class RentalManager implements RentalService {
 	private final RentalCreateProducer  rentalCreateProducer;
 	private final RentalUpdateProducer rentalUpdateProducer;
 	private final CarServiceClient carServiceClient;
+	private final PaymentServiceClient paymentServiceClient;
 
 	@Override
 	public List<GetAllRentalsResponse> getAll() {
@@ -52,17 +56,33 @@ public class RentalManager implements RentalService {
 
 	@Override
 	public CreateRentalResponse add(CreateRentalRequest request) {
+		
 		checkIfExistsRentalByCarId(request.getCarId());
-		carServiceClient.checkIfCarAvailable(request.getCarId());
+		//carServiceClient.checkIfCarAvailable(request.getCarId());
+		
 		Rental rental = mapperService.forRequest().map(request, Rental.class);
-		rentalRepository.save(rental);
+		rental.setId(UUID.randomUUID().toString());
 			
 		RentalCreatedEvent rentalCreatedEvent = new RentalCreatedEvent();
         rentalCreatedEvent.setCarId(rental.getCarId());
         rentalCreatedEvent.setMessage("Rental Created");
-  
-       rentalCreateProducer.sendMessage(rentalCreatedEvent);
+        
+        double rentalTotalPrice =request.getDailyPrice() * request.getRentForDays();
+        rental.setTotalPrice(rentalTotalPrice);		
+        
+        PaymentCreatedEvent paymentCreatedEvent = new PaymentCreatedEvent();
+        paymentCreatedEvent.setRentalId(rental.getId());
+        paymentCreatedEvent.setCardNo(request.getCardNo());
+        paymentCreatedEvent.setCardHolder(request.getCardHolder());
+        paymentCreatedEvent.setCardBalance(request.getCardBalance());
+        paymentCreatedEvent.setTotalPrice(rentalTotalPrice);
+ 
+        rentalCreateProducer.sendMessage(paymentCreatedEvent);
+        paymentServiceClient.checkBalanceEnough(paymentCreatedEvent.getCardBalance(), paymentCreatedEvent.getTotalPrice());
+        rentalRepository.save(rental);
+        rentalCreateProducer.sendMessage(rentalCreatedEvent);
 		 
+       
 		return mapperService.forResponse().map(rental, CreateRentalResponse.class);
 	}
 
