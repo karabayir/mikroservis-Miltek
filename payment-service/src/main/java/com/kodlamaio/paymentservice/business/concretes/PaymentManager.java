@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.kodlamaio.common.events.PaymentInvoiceCreatedEvent;
 import com.kodlamaio.common.utilities.exception.BusinessException;
 import com.kodlamaio.common.utilities.mapper.ModelMapperService;
 import com.kodlamaio.paymentservice.business.abstracts.PaymentService;
@@ -14,6 +15,7 @@ import com.kodlamaio.paymentservice.business.response.CreatePaymentResponse;
 import com.kodlamaio.paymentservice.business.response.GetAllPaymentsResponse;
 import com.kodlamaio.paymentservice.entities.Payment;
 import com.kodlamaio.paymentservice.entities.PaymentStatus;
+import com.kodlamaio.paymentservice.kafka.PaymentCreateProducer;
 import com.kodlamaio.paymentservice.repository.PaymentRepository;
 
 import lombok.AllArgsConstructor;
@@ -24,6 +26,7 @@ public class PaymentManager implements PaymentService{
 
 	private final PaymentRepository paymentRepository;
 	private final ModelMapperService mapperService;
+	private final PaymentCreateProducer paymentCreateProducer;
 
 	@Override
 	public List<GetAllPaymentsResponse> getAll() {
@@ -40,6 +43,16 @@ public class PaymentManager implements PaymentService{
 		payment.setId(UUID.randomUUID().toString());
 		payment.setPaymentStatus(PaymentStatus.ONAY);
 		paymentRepository.save(payment);
+		
+		
+		PaymentInvoiceCreatedEvent event = new PaymentInvoiceCreatedEvent();
+		event.setRentalId(request.getRentalId());
+		event.setCardHolder(request.getCardHolder());
+		event.setTotalPrice(request.getTotalPrice());
+		
+		paymentCreateProducer.sendMessage(event);
+		
+		
 		return mapperService.forResponse().map(payment, CreatePaymentResponse.class);
 	}
 	

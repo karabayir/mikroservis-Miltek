@@ -9,7 +9,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 
-import com.kodlamaio.common.events.PaymentCreatedEvent;
+import com.kodlamaio.common.events.RentalPaymentCreatedEvent;
 import com.kodlamaio.common.events.RentalCreatedEvent;
 
 import lombok.AllArgsConstructor;
@@ -22,7 +22,7 @@ public class RentalCreateProducer {
 
 	    private final NewTopic topic;
 	    private final KafkaTemplate<String, RentalCreatedEvent> kafkaTemplate;
-	    private final KafkaTemplate<String, PaymentCreatedEvent> kafkaTemplatePaymentCreated;
+	    private final KafkaTemplate<String, RentalPaymentCreatedEvent> kafkaTemplatePaymentCreated;
 	    
 	    public void sendMessage(RentalCreatedEvent rentalCreatedEvent) {
 	        LOGGER.info(String.format("Rental created event => %s", rentalCreatedEvent.toString()));
@@ -34,10 +34,10 @@ public class RentalCreateProducer {
 	        kafkaTemplate.send(message);
 	    }
 	    
-	    public void sendMessage(PaymentCreatedEvent paymentCreatedEvent) {
+	    public void sendMessage(RentalPaymentCreatedEvent paymentCreatedEvent) {
 	        LOGGER.info(String.format("Rental created event => %s", paymentCreatedEvent.toString()));
 
-	        Message<PaymentCreatedEvent> message = MessageBuilder
+	        Message<RentalPaymentCreatedEvent> message = MessageBuilder
 	                .withPayload(paymentCreatedEvent)
 	                .setHeader(KafkaHeaders.TOPIC, topic.name()).build();
 	        

@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PaymentCreatedEvent {
+public class RentalPaymentCreatedEvent {
 
 	private String rentalId;
 	private double totalPrice;

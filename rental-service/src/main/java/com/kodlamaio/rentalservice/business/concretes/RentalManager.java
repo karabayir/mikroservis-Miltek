@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.kodlamaio.common.events.PaymentCreatedEvent;
+import com.kodlamaio.common.events.RentalPaymentCreatedEvent;
 import com.kodlamaio.common.events.RentalCreatedEvent;
 import com.kodlamaio.common.events.RentalUpdatedCarEvent;
 import com.kodlamaio.common.utilities.exception.BusinessException;
@@ -70,7 +70,7 @@ public class RentalManager implements RentalService {
         double rentalTotalPrice =request.getDailyPrice() * request.getRentForDays();
         rental.setTotalPrice(rentalTotalPrice);		
         
-        PaymentCreatedEvent paymentCreatedEvent = new PaymentCreatedEvent();
+        RentalPaymentCreatedEvent paymentCreatedEvent = new RentalPaymentCreatedEvent();
         paymentCreatedEvent.setRentalId(rental.getId());
         paymentCreatedEvent.setCardNo(request.getCardNo());
         paymentCreatedEvent.setCardHolder(request.getCardHolder());
