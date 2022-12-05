@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.kodlamaio.common.events.RentalPaymentCreatedEvent;
 import com.kodlamaio.common.events.RentalCreatedEvent;
+import com.kodlamaio.common.events.RentalInvoiceCreatedEvent;
 import com.kodlamaio.common.events.RentalUpdatedCarEvent;
 import com.kodlamaio.common.utilities.exception.BusinessException;
 import com.kodlamaio.common.utilities.mapper.ModelMapperService;
@@ -22,6 +23,7 @@ import com.kodlamaio.rentalservice.client.CarServiceClient;
 import com.kodlamaio.rentalservice.client.PaymentServiceClient;
 import com.kodlamaio.rentalservice.entities.Rental;
 import com.kodlamaio.rentalservice.kafka.RentalCreateProducer;
+import com.kodlamaio.rentalservice.kafka.RentalInvoiceCreateProducer;
 import com.kodlamaio.rentalservice.kafka.RentalPaymentCreateProducer;
 import com.kodlamaio.rentalservice.kafka.RentalUpdateProducer;
 import com.kodlamaio.rentalservice.repository.RentalRepository;
@@ -39,6 +41,7 @@ public class RentalManager implements RentalService {
 	private final CarServiceClient carServiceClient;
 	private final PaymentServiceClient paymentServiceClient;
 	private final RentalPaymentCreateProducer rentalPaymentCreateProducer;
+	private final RentalInvoiceCreateProducer rentalInvoiceCreateProducer;
 
 	@Override
 	public List<GetAllRentalsResponse> getAll() {
@@ -78,11 +81,17 @@ public class RentalManager implements RentalService {
         paymentCreatedEvent.setCardHolder(request.getCardHolder());
         paymentCreatedEvent.setCardBalance(request.getCardBalance());
         paymentCreatedEvent.setTotalPrice(rentalTotalPrice);
+        
+        RentalInvoiceCreatedEvent invoiceCreatedEvent = new RentalInvoiceCreatedEvent();
+        invoiceCreatedEvent.setRentalId(rental.getId());
+        invoiceCreatedEvent.setCardHolder(request.getCardHolder());
+        invoiceCreatedEvent.setTotalPrice(rentalTotalPrice);
  
         rentalPaymentCreateProducer.sendMessage(paymentCreatedEvent);
         paymentServiceClient.checkBalanceEnough(paymentCreatedEvent.getCardBalance(), paymentCreatedEvent.getTotalPrice());
         rentalRepository.save(rental);
         rentalCreateProducer.sendMessage(rentalCreatedEvent);
+        rentalInvoiceCreateProducer.sendMessage(invoiceCreatedEvent);
 		 
        
 		return mapperService.forResponse().map(rental, CreateRentalResponse.class);
