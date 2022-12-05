@@ -21,7 +21,7 @@ public class PaymentConsumer {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(PaymentConsumer.class);
 	
-	@KafkaListener(topics = "${spring.kafka.topic.name}",groupId = "PaymentInvoiceCreate")
+	@KafkaListener(topics = "${spring.kafka.topic.name2}",groupId = "PaymentInvoiceCreate")
 	public void consume(PaymentInvoiceCreatedEvent event) {
 		LOGGER.info(String.format("Order event received in stock service => %s", event.toString()));
 		CreateInvoiceRequest request =mapperService.forRequest().map(event, CreateInvoiceRequest.class);

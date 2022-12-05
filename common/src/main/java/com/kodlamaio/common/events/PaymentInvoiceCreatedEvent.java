@@ -13,5 +13,7 @@ public class PaymentInvoiceCreatedEvent {
 
 	private String rentalId;
 	private double totalPrice;
+	private String cardNo;
 	private String cardHolder;
+	private double cardBalance;
 }

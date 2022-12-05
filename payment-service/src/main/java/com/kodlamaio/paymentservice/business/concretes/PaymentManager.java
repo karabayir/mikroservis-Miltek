@@ -41,13 +41,13 @@ public class PaymentManager implements PaymentService{
 		Payment payment=mapperService.forRequest().map(request, Payment.class);
 		payment.setId(UUID.randomUUID().toString());
 		payment.setPaymentStatus(PaymentStatus.ONAY);
-		paymentRepository.save(payment);
+		Payment savedPayment= paymentRepository.save(payment);
 		
 		
 		PaymentInvoiceCreatedEvent event = new PaymentInvoiceCreatedEvent();
-		event.setRentalId(request.getRentalId());
-		event.setCardHolder(request.getCardHolder());
-		event.setTotalPrice(request.getTotalPrice());
+		event.setRentalId(savedPayment.getRentalId());
+		event.setCardHolder(savedPayment.getCardHolder());
+		event.setTotalPrice(savedPayment.getTotalPrice());
 		
 		paymentCreateProducer.sendMessage(event);
 		

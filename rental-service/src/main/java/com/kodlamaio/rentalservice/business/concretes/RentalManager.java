@@ -22,6 +22,7 @@ import com.kodlamaio.rentalservice.client.CarServiceClient;
 import com.kodlamaio.rentalservice.client.PaymentServiceClient;
 import com.kodlamaio.rentalservice.entities.Rental;
 import com.kodlamaio.rentalservice.kafka.RentalCreateProducer;
+import com.kodlamaio.rentalservice.kafka.RentalPaymentCreateProducer;
 import com.kodlamaio.rentalservice.kafka.RentalUpdateProducer;
 import com.kodlamaio.rentalservice.repository.RentalRepository;
 
@@ -37,6 +38,7 @@ public class RentalManager implements RentalService {
 	private final RentalUpdateProducer rentalUpdateProducer;
 	private final CarServiceClient carServiceClient;
 	private final PaymentServiceClient paymentServiceClient;
+	private final RentalPaymentCreateProducer rentalPaymentCreateProducer;
 
 	@Override
 	public List<GetAllRentalsResponse> getAll() {
@@ -77,7 +79,7 @@ public class RentalManager implements RentalService {
         paymentCreatedEvent.setCardBalance(request.getCardBalance());
         paymentCreatedEvent.setTotalPrice(rentalTotalPrice);
  
-        rentalCreateProducer.sendMessage(paymentCreatedEvent);
+        rentalPaymentCreateProducer.sendMessage(paymentCreatedEvent);
         paymentServiceClient.checkBalanceEnough(paymentCreatedEvent.getCardBalance(), paymentCreatedEvent.getTotalPrice());
         rentalRepository.save(rental);
         rentalCreateProducer.sendMessage(rentalCreatedEvent);
