@@ -5,9 +5,11 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.kodlamaio.common.events.brand.BrandUpdatedEvent;
 import com.kodlamaio.common.utilities.exception.BusinessException;
 import com.kodlamaio.common.utilities.mapper.ModelMapperService;
 import com.kodlamaio.inventoryservice.business.abstracts.BrandService;
+import com.kodlamaio.inventoryservice.business.kafka.produce.InventoryProducer;
 import com.kodlamaio.inventoryservice.business.requests.create.CreateBrandRequest;
 import com.kodlamaio.inventoryservice.business.requests.update.UpdateBrandRequest;
 import com.kodlamaio.inventoryservice.business.responses.create.CreateBrandResponse;
@@ -25,6 +27,7 @@ public class BrandManager implements BrandService{
 
 	private final BrandRepository brandRepository;
 	private final ModelMapperService mapperService;
+	private final InventoryProducer inventoryProducer;
 	
 	@Override
 	public List<GetAllBrandsResponse> getAll() {
@@ -56,7 +59,11 @@ public class BrandManager implements BrandService{
 		checkIfBrandExistById(request.getId());
 		checkIfBrandExistByName(request.getName());
 		Brand brand = mapperService.forRequest().map(request, Brand.class);
-		brandRepository.save(brand);
+		Brand savedBrand = brandRepository.save(brand);
+		
+		BrandUpdatedEvent event = mapperService.forResponse().map(savedBrand, BrandUpdatedEvent.class);
+		inventoryProducer.sendMessage(event);
+		
 		UpdateBrandResponse response = mapperService.forResponse().map(brand, UpdateBrandResponse.class);
 		return response;
 	}

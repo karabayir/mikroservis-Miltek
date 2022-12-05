@@ -5,8 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
-import com.kodlamaio.common.events.RentalInvoiceCreatedEvent;
-import com.kodlamaio.common.events.RentalPaymentCreatedEvent;
+import com.kodlamaio.common.events.rental.RentalInvoiceCreatedEvent;
+import com.kodlamaio.common.events.rental.RentalPaymentCreatedEvent;
 import com.kodlamaio.common.utilities.mapper.ModelMapperService;
 import com.kodlamaio.invoiceservice.business.abstracts.InvoiceService;
 import com.kodlamaio.invoiceservice.business.request.CreateInvoiceRequest;

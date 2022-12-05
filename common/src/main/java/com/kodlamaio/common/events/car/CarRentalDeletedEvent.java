@@ -1,4 +1,4 @@
-package com.kodlamaio.common.events;
+package com.kodlamaio.common.events.car;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RentalUpdatedCarEvent {
-
-	private String oldCarId;
-	private String newCarId;
+public class CarRentalDeletedEvent {
+	private String carId;
 }

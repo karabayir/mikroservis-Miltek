@@ -40,4 +40,4 @@ spring:
               packages: '*'
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
     topic:
-      name: rental_topics4
+      name: rental_topics5

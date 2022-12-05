@@ -5,10 +5,13 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import com.kodlamaio.common.events.model.ModelDeletedEvent;
+import com.kodlamaio.common.events.model.ModelUpdatedEvent;
 import com.kodlamaio.common.utilities.exception.BusinessException;
 import com.kodlamaio.common.utilities.mapper.ModelMapperService;
 import com.kodlamaio.inventoryservice.business.abstracts.BrandService;
 import com.kodlamaio.inventoryservice.business.abstracts.ModelService;
+import com.kodlamaio.inventoryservice.business.kafka.produce.InventoryProducer;
 import com.kodlamaio.inventoryservice.business.requests.create.CreateModelRequest;
 import com.kodlamaio.inventoryservice.business.requests.update.UpdateModelRequest;
 import com.kodlamaio.inventoryservice.business.responses.create.CreateModelResponse;
@@ -27,6 +30,7 @@ public class ModelManager implements ModelService {
 	private final ModelRespository modelRespository;
 	private final ModelMapperService mapperService;
     private final BrandService brandService;
+    private final InventoryProducer inventoryProducer;
 
 	@Override
 	public List<GetAllModelsResponse> getAll() {
@@ -58,13 +62,20 @@ public class ModelManager implements ModelService {
 		checkIfModelExistById(request.getId());
 		brandService.checkIfBrandExistById(request.getBrandId());
 		Model model = mapperService.forRequest().map(request, Model.class);
-		modelRespository.save(model);
+		Model savedModel = modelRespository.save(model);
+		
+		ModelUpdatedEvent event = mapperService.forResponse().map(savedModel, ModelUpdatedEvent.class);
+		inventoryProducer.sendMessage(event);
+		
 		UpdateModelResponse response = mapperService.forResponse().map(model, UpdateModelResponse.class);
 		return response;
 	}
 
 	@Override
 	public void deleteById(String id) {
+		ModelDeletedEvent event = new ModelDeletedEvent();
+		event.setModelId(id);
+		inventoryProducer.sendMessage(event);
 		modelRespository.deleteById(id);
 	}
 	

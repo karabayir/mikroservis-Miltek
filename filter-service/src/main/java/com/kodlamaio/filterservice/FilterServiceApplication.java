@@ -1,4 +1,4 @@
-package com.kodlamaio.inventoryservice;
+package com.kodlamaio.filterservice;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
@@ -11,11 +11,12 @@ import com.kodlamaio.common.utilities.mapper.ModelMapperService;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-public class InventoryServiceApplication {
+public class FilterServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(InventoryServiceApplication.class, args);
+		SpringApplication.run(FilterServiceApplication.class, args);
 	}
+
 
 	@Bean
 	public ModelMapper getModelMapper() {

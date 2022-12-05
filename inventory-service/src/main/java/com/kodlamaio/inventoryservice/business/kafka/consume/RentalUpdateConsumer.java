@@ -1,10 +1,10 @@
-package com.kodlamaio.inventoryservice.business.kafka;
+package com.kodlamaio.inventoryservice.business.kafka.consume;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 
-import com.kodlamaio.common.events.RentalUpdatedCarEvent;
+import com.kodlamaio.common.events.rental.RentalUpdatedCarEvent;
 import com.kodlamaio.inventoryservice.business.abstracts.CarService;
 
 public class RentalUpdateConsumer {

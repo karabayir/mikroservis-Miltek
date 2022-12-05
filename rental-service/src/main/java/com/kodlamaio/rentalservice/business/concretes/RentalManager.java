@@ -6,10 +6,10 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.kodlamaio.common.events.RentalPaymentCreatedEvent;
-import com.kodlamaio.common.events.RentalCreatedEvent;
-import com.kodlamaio.common.events.RentalInvoiceCreatedEvent;
-import com.kodlamaio.common.events.RentalUpdatedCarEvent;
+import com.kodlamaio.common.events.rental.RentalCreatedEvent;
+import com.kodlamaio.common.events.rental.RentalInvoiceCreatedEvent;
+import com.kodlamaio.common.events.rental.RentalPaymentCreatedEvent;
+import com.kodlamaio.common.events.rental.RentalUpdatedCarEvent;
 import com.kodlamaio.common.utilities.exception.BusinessException;
 import com.kodlamaio.common.utilities.mapper.ModelMapperService;
 import com.kodlamaio.rentalservice.business.abstracts.RentalService;	
