@@ -3,6 +3,7 @@ package com.kodlamaio.inventoryservice.entities;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -17,8 +18,11 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Brand extends BaseEntity{
+public class Brand {
 
+	@Id
+	private String id;
+	
 	private String name;
 	
 	@OneToMany(mappedBy = "brand")

@@ -14,6 +14,7 @@ import com.kodlamaio.common.utilities.mapper.ModelMapperService;
 import com.kodlamaio.inventoryservice.business.abstracts.CarService;
 import com.kodlamaio.inventoryservice.business.abstracts.ModelService;
 import com.kodlamaio.inventoryservice.business.kafka.produce.InventoryProducer;
+import com.kodlamaio.inventoryservice.business.kafka.produce.InvetoryCreateProducer;
 import com.kodlamaio.inventoryservice.business.requests.create.CreateCarRequest;
 import com.kodlamaio.inventoryservice.business.requests.update.UpdateCarRequest;
 import com.kodlamaio.inventoryservice.business.responses.create.CreateCarResponse;
@@ -33,6 +34,7 @@ public class CarManager implements CarService {
 	private final CarRepository carRepository;
 	private final ModelMapperService mapperService;
 	private final ModelService modelService;
+	private final InvetoryCreateProducer invetoryCreateProducer;
 	private final InventoryProducer inventoryProducer;
 
 	@Override
@@ -59,10 +61,20 @@ public class CarManager implements CarService {
 		
 		Car car = mapperService.forRequest().map(request, Car.class);
 		car.setId(UUID.randomUUID().toString());
-		Car savedCar =carRepository.save(car);
+		carRepository.save(car);
 		
-		InventoryCreatedEvent event = mapperService.forResponse().map(savedCar, InventoryCreatedEvent.class);
-		inventoryProducer.sendMessage(event);
+		Car savedCar = carRepository.findById(car.getId()).orElseThrow();
+		InventoryCreatedEvent event = new InventoryCreatedEvent();
+		event.setBrandId(savedCar.getModel().getBrand().getId());
+		event.setBrandName(savedCar.getModel().getBrand().getName());
+		event.setCarId(savedCar.getId());
+		event.setDailyPrice(savedCar.getDailyPrice());
+		event.setModelId(savedCar.getModel().getId());
+		event.setModelName(savedCar.getModel().getName());
+		event.setModelYear(savedCar.getModelYear());
+		event.setPlate(savedCar.getPlate());
+		event.setState(savedCar.getState().name());
+		invetoryCreateProducer.sendMessage(event);
 		
 		CreateCarResponse response = mapperService.forResponse().map(car, CreateCarResponse.class);
 		return response;

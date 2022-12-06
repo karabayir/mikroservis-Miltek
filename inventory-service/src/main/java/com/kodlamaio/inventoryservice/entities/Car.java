@@ -3,6 +3,7 @@ package com.kodlamaio.inventoryservice.entities;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -18,8 +19,10 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Car extends BaseEntity {
+public class Car {
 
+	@Id
+	private String id;
 	
 	private String plate;
 	private int modelYear;

@@ -20,18 +20,20 @@ import com.kodlamaio.common.events.model.ModelUpdatedEvent;
 import com.kodlamaio.common.events.rental.RentalCreatedEvent;
 import com.kodlamaio.common.events.rental.RentalUpdatedCarEvent;
 
-import lombok.AllArgsConstructor;
 
 @Service
-@AllArgsConstructor
 public class InventoryProducer {
 
 	 private static final Logger LOGGER = LoggerFactory.getLogger(InventoryProducer.class); 
 	 private final NewTopic topic;
 	 private final KafkaTemplate<String, InventoryCreatedEvent> kafkaTemplate;
-	 
-	 
-	 public void sendMessage(InventoryCreatedEvent event) {
+	  
+	 public InventoryProducer(NewTopic topic, KafkaTemplate<String, InventoryCreatedEvent> kafkaTemplate) {
+		this.topic = topic;
+		this.kafkaTemplate = kafkaTemplate;
+	}
+
+	public void sendMessage(InventoryCreatedEvent event) {
 	        LOGGER.info(String.format("Inventory created event => %s", event.toString()));
 
 	        Message<InventoryCreatedEvent> message = MessageBuilder
