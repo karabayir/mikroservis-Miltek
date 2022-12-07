@@ -21,7 +21,7 @@ public class InvetoryCreateProducer {
 	 private final NewTopic topic;
 	 private final KafkaTemplate<String, InventoryCreatedEvent> kafkaTemplate;
 	 
-	 public void sendMessage(InventoryCreatedEvent event) {
+	 public void sendMessage( InventoryCreatedEvent event) {
 	        LOGGER.info(String.format("Inventory created event => %s", event.toString()));
 
 	        Message<InventoryCreatedEvent> message = MessageBuilder

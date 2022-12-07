@@ -3,6 +3,7 @@ package com.kodlamaio.filterservice.kafka;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
 import com.kodlamaio.common.events.InventoryCreatedEvent;
@@ -33,7 +34,7 @@ public class InventoryConsumer {
 	            topics = "${spring.kafka.topic.name}"
 	            , groupId = "inventory-create"
 	    )
-	    public void consume(InventoryCreatedEvent event) {
+	    public void consume(@Payload InventoryCreatedEvent event) {
 	        Filter filter = mapperService.forRequest().map(event, Filter.class);
 	        filterService.save(filter);
 	        LOGGER.info("Inventory created event consumed: {}", event);
