@@ -1,4 +1,4 @@
-package com.kodlamaio.inventoryservice.business.kafka.consume;
+package com.kodlamaio.inventoryservice.kafka.consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

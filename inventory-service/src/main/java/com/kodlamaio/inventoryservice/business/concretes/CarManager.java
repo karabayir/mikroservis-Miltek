@@ -13,8 +13,6 @@ import com.kodlamaio.common.utilities.exception.BusinessException;
 import com.kodlamaio.common.utilities.mapper.ModelMapperService;
 import com.kodlamaio.inventoryservice.business.abstracts.CarService;
 import com.kodlamaio.inventoryservice.business.abstracts.ModelService;
-import com.kodlamaio.inventoryservice.business.kafka.produce.InventoryProducer;
-import com.kodlamaio.inventoryservice.business.kafka.produce.InvetoryCreateProducer;
 import com.kodlamaio.inventoryservice.business.requests.create.CreateCarRequest;
 import com.kodlamaio.inventoryservice.business.requests.update.UpdateCarRequest;
 import com.kodlamaio.inventoryservice.business.responses.create.CreateCarResponse;
@@ -23,6 +21,7 @@ import com.kodlamaio.inventoryservice.business.responses.get.GetCarResponse;
 import com.kodlamaio.inventoryservice.business.responses.update.UpdateCarResponse;
 import com.kodlamaio.inventoryservice.entities.Car;
 import com.kodlamaio.inventoryservice.entities.CarState;
+import com.kodlamaio.inventoryservice.kafka.producer.InventoryProducer;
 import com.kodlamaio.inventoryservice.repository.CarRepository;
 
 import lombok.AllArgsConstructor;
@@ -34,8 +33,8 @@ public class CarManager implements CarService {
 	private final CarRepository carRepository;
 	private final ModelMapperService mapperService;
 	private final ModelService modelService;
-	private final InvetoryCreateProducer invetoryCreateProducer;
-	private final InventoryProducer inventoryProducer;
+	private final InventoryProducer producer;
+
 
 	@Override
 	public List<GetAllCarsResponse> getAll() {
@@ -54,44 +53,24 @@ public class CarManager implements CarService {
 	}
 
 	@Override
-	public CreateCarResponse add(CreateCarRequest request) {
-		
+	public CreateCarResponse add(CreateCarRequest request) {	
 		checkIfCarExistByPlate(request.getPlate());
 		modelService.checkIfModelExistById(request.getModelId());
-		
 		Car car = mapperService.forRequest().map(request, Car.class);
 		car.setId(UUID.randomUUID().toString());
-		carRepository.save(car);
-		
-		Car savedCar = carRepository.findById(car.getId()).orElseThrow();
-		InventoryCreatedEvent event = new InventoryCreatedEvent();
-		event.setBrandId(savedCar.getModel().getBrand().getId());
-		event.setBrandName(savedCar.getModel().getBrand().getName());
-		event.setCarId(savedCar.getId());
-		event.setDailyPrice(savedCar.getDailyPrice());
-		event.setModelId(savedCar.getModel().getId());
-		event.setModelName(savedCar.getModel().getName());
-		event.setModelYear(savedCar.getModelYear());
-		event.setPlate(savedCar.getPlate());
-		event.setState(savedCar.getState().name());
-		invetoryCreateProducer.sendMessage(event);
-		
-		CreateCarResponse response = mapperService.forResponse().map(car, CreateCarResponse.class);
+		carRepository.save(car);	
+		addToMongo(car.getId());		
+		CreateCarResponse response = mapperService.forResponse().map(car, CreateCarResponse.class);		
 		return response;
 	}
 
 	@Override
 	public UpdateCarResponse update(UpdateCarRequest request) {
 		checkIfCarExistById(request.getId());
-		checkIfCarExistByPlate(request.getPlate());
 		modelService.checkIfModelExistById(request.getModelId());
 		Car car = mapperService.forRequest().map(request, Car.class);
-		Car savedCar = carRepository.save(car);
-		
-		
-		CarUpdatedEvent event = mapperService.forResponse().map(savedCar, CarUpdatedEvent.class);
-		inventoryProducer.sendMessage(event);
-		
+	    carRepository.save(car);
+		updateCarToMongo(request);
 		UpdateCarResponse response = mapperService.forResponse().map(car, UpdateCarResponse.class);
 		return response;
 	}
@@ -99,11 +78,7 @@ public class CarManager implements CarService {
 	@Override
 	public void deleteById(String id) {
 		checkIfCarExistById(id);
-		
-		CarDeletedEvent event = new CarDeletedEvent();
-		event.setCarId(id);
-		inventoryProducer.sendMessage(event);
-		
+		deleteToMongo(id);
 		carRepository.deleteById(id);	
 	}
 	
@@ -145,10 +120,40 @@ public class CarManager implements CarService {
 			throw new BusinessException("Car Exist");
 	}
 
+	private void addToMongo(String carId) {
+		Car savedCar = carRepository.findById(carId).orElseThrow();
+		InventoryCreatedEvent event = new InventoryCreatedEvent();
+		event.setBrandId(savedCar.getModel().getBrand().getId());
+		event.setBrandName(savedCar.getModel().getBrand().getName());
+		event.setCarId(savedCar.getId());
+		event.setDailyPrice(savedCar.getDailyPrice());
+		event.setModelId(savedCar.getModel().getId());
+		event.setModelName(savedCar.getModel().getName());
+		event.setModelYear(savedCar.getModelYear());
+		event.setPlate(savedCar.getPlate());
+		event.setState(savedCar.getState().name());
+		producer.sendMessage(event);
+	}
 	
 
-	
+	private void updateCarToMongo(UpdateCarRequest request) {
+		Car car = carRepository.findById(request.getId()).orElseThrow();
+		car.getModel().setId(request.getModelId());
+        car.getModel().getBrand().setId(car.getModel().getBrand().getId());
+        car.setState(request.getState());
+        car.setPlate(request.getPlate());
+        car.setModelYear(request.getModelYear());
+        CarUpdatedEvent event = mapperService.forResponse().map(car, CarUpdatedEvent.class);
+        event.setState(car.getState().name());
+		producer.sendMessage(event);
+	}
 
+	private void deleteToMongo(String id) {
+		checkIfCarExistById(id);
+		CarDeletedEvent event = new CarDeletedEvent();
+		event.setCarId(id);
+		producer.sendMessage(event);
+	}
 	
 	
 }

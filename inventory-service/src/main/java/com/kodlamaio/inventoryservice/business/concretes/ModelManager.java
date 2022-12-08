@@ -11,7 +11,6 @@ import com.kodlamaio.common.utilities.exception.BusinessException;
 import com.kodlamaio.common.utilities.mapper.ModelMapperService;
 import com.kodlamaio.inventoryservice.business.abstracts.BrandService;
 import com.kodlamaio.inventoryservice.business.abstracts.ModelService;
-import com.kodlamaio.inventoryservice.business.kafka.produce.InventoryProducer;
 import com.kodlamaio.inventoryservice.business.requests.create.CreateModelRequest;
 import com.kodlamaio.inventoryservice.business.requests.update.UpdateModelRequest;
 import com.kodlamaio.inventoryservice.business.responses.create.CreateModelResponse;
@@ -19,6 +18,7 @@ import com.kodlamaio.inventoryservice.business.responses.get.GetAllModelsRespons
 import com.kodlamaio.inventoryservice.business.responses.get.GetModelResponse;
 import com.kodlamaio.inventoryservice.business.responses.update.UpdateModelResponse;
 import com.kodlamaio.inventoryservice.entities.Model;
+import com.kodlamaio.inventoryservice.kafka.producer.InventoryProducer;
 import com.kodlamaio.inventoryservice.repository.ModelRespository;
 
 import lombok.AllArgsConstructor;
@@ -30,7 +30,7 @@ public class ModelManager implements ModelService {
 	private final ModelRespository modelRespository;
 	private final ModelMapperService mapperService;
     private final BrandService brandService;
-    private final InventoryProducer inventoryProducer;
+    private final InventoryProducer producer;
 
 	@Override
 	public List<GetAllModelsResponse> getAll() {
@@ -62,11 +62,8 @@ public class ModelManager implements ModelService {
 		checkIfModelExistById(request.getId());
 		brandService.checkIfBrandExistById(request.getBrandId());
 		Model model = mapperService.forRequest().map(request, Model.class);
-		Model savedModel = modelRespository.save(model);
-		
-		ModelUpdatedEvent event = mapperService.forResponse().map(savedModel, ModelUpdatedEvent.class);
-		inventoryProducer.sendMessage(event);
-		
+		modelRespository.save(model);
+		updateToMongo(request.getId(), request.getName(), request.getBrandId());
 		UpdateModelResponse response = mapperService.forResponse().map(model, UpdateModelResponse.class);
 		return response;
 	}
@@ -75,7 +72,7 @@ public class ModelManager implements ModelService {
 	public void deleteById(String id) {
 		ModelDeletedEvent event = new ModelDeletedEvent();
 		event.setModelId(id);
-		inventoryProducer.sendMessage(event);
+		deleteToMongo(id);
 		modelRespository.deleteById(id);
 	}
 	
@@ -85,4 +82,17 @@ public class ModelManager implements ModelService {
 			throw new BusinessException(id+" Model Not Exist");
 	}
 	
+	 private void updateToMongo(String id, String name, String brandId) {
+	        ModelUpdatedEvent event = new ModelUpdatedEvent();
+	        event.setId(id);
+	        event.setName(name);
+	        event.setBrandId(brandId);
+	        producer.sendMessage(event);
+	    }
+	
+	  private void deleteToMongo(String id) {
+	        ModelDeletedEvent event = new ModelDeletedEvent();
+	        event.setModelId(id);
+	        producer.sendMessage(event);
+	    }
 }
