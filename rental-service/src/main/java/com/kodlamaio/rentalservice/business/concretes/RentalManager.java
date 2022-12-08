@@ -63,7 +63,7 @@ public class RentalManager implements RentalService {
 	public CreateRentalResponse add(CreateRentalRequest request) {
 		
 		checkIfExistsRentalByCarId(request.getCarId());
-		//carServiceClient.checkIfCarAvailable(request.getCarId());
+	    carServiceClient.checkIfCarAvailable(request.getCarId());
 		
 		Rental rental = mapperService.forRequest().map(request, Rental.class);
 		rental.setId(UUID.randomUUID().toString());
@@ -87,9 +87,9 @@ public class RentalManager implements RentalService {
         invoiceCreatedEvent.setCardHolder(request.getCardHolder());
         invoiceCreatedEvent.setTotalPrice(rentalTotalPrice);
  
-        rentalPaymentCreateProducer.sendMessage(paymentCreatedEvent);
         paymentServiceClient.checkBalanceEnough(paymentCreatedEvent.getCardBalance(), paymentCreatedEvent.getTotalPrice());
         rentalRepository.save(rental);
+        rentalPaymentCreateProducer.sendMessage(paymentCreatedEvent);
         rentalCreateProducer.sendMessage(rentalCreatedEvent);
         rentalInvoiceCreateProducer.sendMessage(invoiceCreatedEvent);
 		 
