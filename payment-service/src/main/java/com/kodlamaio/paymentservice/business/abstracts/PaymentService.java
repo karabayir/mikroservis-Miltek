@@ -2,6 +2,7 @@ package com.kodlamaio.paymentservice.business.abstracts;
 
 import java.util.List;
 
+import com.kodlamaio.common.events.request.CreateRentalPaymentRequest;
 import com.kodlamaio.paymentservice.business.request.CreatePaymentRequest;
 import com.kodlamaio.paymentservice.business.response.CreatePaymentResponse;
 import com.kodlamaio.paymentservice.business.response.GetAllPaymentsResponse;
@@ -12,5 +13,5 @@ public interface PaymentService {
 	
 	CreatePaymentResponse add(CreatePaymentRequest request);
 	
-	void checkBalanceEnough(double balance, double totalPrice);
+	void checkIfPaymentSuccess(CreateRentalPaymentRequest request);
 }

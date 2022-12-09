@@ -41,7 +41,7 @@ public class CarController {
 	}
 	
 	@GetMapping("checkIfCarAvailable/{id}")
-	void checkIfCarAvailable(String id) {
+	void checkIfCarAvailable(@PathVariable String id) {
 		carService.checkIfCarAvailable(id);
 	}
 	

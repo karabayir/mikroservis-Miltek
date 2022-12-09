@@ -10,6 +10,7 @@ import com.kodlamaio.common.events.rental.RentalCreatedEvent;
 import com.kodlamaio.common.events.rental.RentalInvoiceCreatedEvent;
 import com.kodlamaio.common.events.rental.RentalPaymentCreatedEvent;
 import com.kodlamaio.common.events.rental.RentalUpdatedCarEvent;
+import com.kodlamaio.common.events.request.CreateRentalPaymentRequest;
 import com.kodlamaio.common.utilities.exception.BusinessException;
 import com.kodlamaio.common.utilities.mapper.ModelMapperService;
 import com.kodlamaio.rentalservice.business.abstracts.RentalService;	
@@ -39,9 +40,9 @@ public class RentalManager implements RentalService {
 	private final RentalCreateProducer  rentalCreateProducer;
 	private final RentalUpdateProducer rentalUpdateProducer;
 	private final CarServiceClient carServiceClient;
-	private final PaymentServiceClient paymentServiceClient;
 	private final RentalPaymentCreateProducer rentalPaymentCreateProducer;
 	private final RentalInvoiceCreateProducer rentalInvoiceCreateProducer;
+	private final PaymentServiceClient paymentServiceClient;
 
 	@Override
 	public List<GetAllRentalsResponse> getAll() {
@@ -86,8 +87,11 @@ public class RentalManager implements RentalService {
         invoiceCreatedEvent.setRentalId(rental.getId());
         invoiceCreatedEvent.setCardHolder(request.getCardHolder());
         invoiceCreatedEvent.setTotalPrice(rentalTotalPrice);
+        
+        CreateRentalPaymentRequest paymentRequest = mapperService.forRequest().map(request, CreateRentalPaymentRequest.class);
+        paymentRequest.setTotalPrice(rentalTotalPrice);
  
-        paymentServiceClient.checkBalanceEnough(paymentCreatedEvent.getCardBalance(), paymentCreatedEvent.getTotalPrice());
+        paymentServiceClient.checkBalanceEnough(paymentRequest);
         rentalRepository.save(rental);
         rentalPaymentCreateProducer.sendMessage(paymentCreatedEvent);
         rentalCreateProducer.sendMessage(rentalCreatedEvent);
