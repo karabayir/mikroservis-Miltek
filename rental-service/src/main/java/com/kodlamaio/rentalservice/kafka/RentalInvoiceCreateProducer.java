@@ -27,7 +27,7 @@ public class RentalInvoiceCreateProducer {
 
         Message<RentalInvoiceCreatedEvent> message = MessageBuilder
                 .withPayload(invoiceCreatedEvent)
-                .setHeader(KafkaHeaders.TOPIC, topic.name()).build();
+                .setHeader(KafkaHeaders.TOPIC, "payment-received").build();
         
         kafkaTemplate.send(message);
     }

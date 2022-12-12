@@ -26,13 +26,13 @@ public class InventoryConsumer {
 	private final FilterService filterService;
 	private final ModelMapperService mapperService;
 	
-	@KafkaListener(topics = "${spring.kafka.topic.name}", groupId = "inventory-create")
+	@KafkaListener(topics = "inventory-car-created", groupId = "inventory-create")
 	public void consume(InventoryCreatedEvent event) {
 		Filter filter = mapperService.forRequest().map(event, Filter.class);
 		filterService.save(filter);
 	}
 	
-	@KafkaListener(topics = "${spring.kafka.topic.name}", groupId = "car-update")
+	@KafkaListener(topics = "inventory-car-updated", groupId = "car-update")
 	public void consume(CarUpdatedEvent event) {
 		Filter filter = mapperService.forRequest().map(event, Filter.class);
 		String id = filterService.getByCarId(event.getCarId()).getId();
@@ -40,12 +40,12 @@ public class InventoryConsumer {
 		filterService.save(filter);
 	}
 	
-	@KafkaListener(topics = "${spring.kafka.topic.name}", groupId = "car-delete")
+	@KafkaListener(topics = "inventory-car-deleted", groupId = "car-delete")
 	public void consume(CarDeletedEvent event) {
 		filterService.deleteById(event.getCarId());
 	}
 	
-	@KafkaListener(topics = "${spring.kafka.topic.name}", groupId = "brand-update")
+	@KafkaListener(topics = "inventory-brand-updated", groupId = "brand-update")
 	public void consume(BrandUpdatedEvent event) {
 		  filterService.getByBrandId(event.getId())
 		  .forEach(filter -> {  filter.setBrandName(event.getName());
@@ -53,12 +53,12 @@ public class InventoryConsumer {
 	       });
 	}
 	
-	@KafkaListener(topics = "${spring.kafka.topic.name}", groupId = "brand-delete")
+	@KafkaListener(topics = "inventory-brand-deleted", groupId = "brand-delete")
 	public void consume(BrandDeletedEvent event) {
 		filterService.deleteById(event.getBrandId());
 	}
 	
-	@KafkaListener(topics = "${spring.kafka.topic.name}", groupId = "model-update")
+	@KafkaListener(topics = "inventory-model-updated", groupId = "model-update")
 	public void consume(ModelUpdatedEvent event) {
 		
 		filterService.getByModelId(event.getId())
@@ -70,12 +70,12 @@ public class InventoryConsumer {
         });
 	}
 	
-	@KafkaListener(topics = "${spring.kafka.topic.name}", groupId = "model-delete")
+	@KafkaListener(topics = "inventory-model-deleted", groupId = "model-delete")
 	public void consume(ModelDeletedEvent event) {
 		filterService.deleteById(event.getModelId());
 	}
 	
-	@KafkaListener(topics = "${spring.kafka.topic.name}", groupId = "rental-create")
+	@KafkaListener(topics = "inventory-rental-created", groupId = "rental-create")
 	public void consume(RentalCreatedEvent event) {
 		Filter filter = filterService.getByCarId(event.getCarId());
 		filter.setState("NOT_AVAILABLE");
@@ -92,7 +92,7 @@ public class InventoryConsumer {
 		filterService.save(newCar);
 	}
 	
-	@KafkaListener(topics = "${spring.kafka.topic.name}", groupId = "rental-delete")
+	@KafkaListener(topics = "inventory-rental-deleted", groupId = "rental-delete")
 	public void consume(CarRentalDeletedEvent event) {
 		Filter car = filterService.getByCarId(event.getCarId());
 		car.setState("AVAILABLE");

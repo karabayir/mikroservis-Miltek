@@ -27,7 +27,7 @@ public class RentalUpdateProducer {
 	    	LOGGER.info(String.format("Rental updated car event => %s", rentalUpdatedCarEvent.toString()));
 	    	Message<RentalUpdatedCarEvent> message= MessageBuilder
 	    			.withPayload(rentalUpdatedCarEvent)
-	    			.setHeader(KafkaHeaders.TOPIC, topic.name())
+	    			.setHeader(KafkaHeaders.TOPIC, "rental-updated")
 	    			.build();
 	    	
 	    	kafkaTemplate.send(message);

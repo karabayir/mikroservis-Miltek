@@ -22,10 +22,11 @@ public class PaymentConsumer {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(PaymentConsumer.class);
 	
-	@KafkaListener(topics = "${spring.kafka.topic.name}",groupId = "RentalInvoiceCreate")
+	@KafkaListener(topics = "payment-received",groupId = "payment-receive")
 	public void consume(RentalInvoiceCreatedEvent event) {
 		LOGGER.info(String.format("Order event received in stock service => %s", event.toString()));
 		CreateInvoiceRequest request =mapperService.forRequest().map(event, CreateInvoiceRequest.class);
+		request.setRentalId(event.getRentalId());
 		invoiceService.add(request);
 	}
 }

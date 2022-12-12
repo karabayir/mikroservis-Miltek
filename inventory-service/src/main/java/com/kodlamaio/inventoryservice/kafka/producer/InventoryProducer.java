@@ -36,7 +36,7 @@ public class InventoryProducer {
 		
 		Message<InventoryCreatedEvent> message = MessageBuilder
 				.withPayload(event)
-				.setHeader(KafkaHeaders.TOPIC, topic.name()).build();
+				.setHeader(KafkaHeaders.TOPIC,"inventory-car-created").build();
 		kafkaTemplate.send(message);
 	}
 	
@@ -45,7 +45,7 @@ public class InventoryProducer {
 		
 		Message<CarUpdatedEvent> message = MessageBuilder
 				.withPayload(event)
-				.setHeader(KafkaHeaders.TOPIC, topic.name()).build();
+				.setHeader(KafkaHeaders.TOPIC, "inventory-car-updated").build();
 		kafkaTemplate.send(message);
 	}
 	
@@ -54,7 +54,7 @@ public class InventoryProducer {
 		
 		Message<CarDeletedEvent> message = MessageBuilder
 				.withPayload(event)
-				.setHeader(KafkaHeaders.TOPIC, topic.name()).build();
+				.setHeader(KafkaHeaders.TOPIC, "inventory-car-deleted").build();
 		kafkaTemplate.send(message);
 	}
 	
@@ -63,7 +63,7 @@ public class InventoryProducer {
 
 	        Message<BrandUpdatedEvent> message = MessageBuilder
 	                .withPayload(event)
-	                .setHeader(KafkaHeaders.TOPIC, topic.name()).build();
+	                .setHeader(KafkaHeaders.TOPIC, "inventory-brand-updated").build();
 
 	        kafkaTemplate.send(message);
 	    }
@@ -74,7 +74,7 @@ public class InventoryProducer {
 
 	        Message<BrandDeletedEvent> message = MessageBuilder
 	                .withPayload(event)
-	                .setHeader(KafkaHeaders.TOPIC, topic.name()).build();
+	                .setHeader(KafkaHeaders.TOPIC, "inventory-brand-deleted").build();
 
 	        kafkaTemplate.send(message);
 	    }
@@ -84,7 +84,7 @@ public class InventoryProducer {
 
 	        Message<ModelUpdatedEvent> message = MessageBuilder
 	                .withPayload(event)
-	                .setHeader(KafkaHeaders.TOPIC, topic.name()).build();
+	                .setHeader(KafkaHeaders.TOPIC, "inventory-model-updated").build();
 
 	        kafkaTemplate.send(message);
 	    }
@@ -94,7 +94,7 @@ public class InventoryProducer {
 
 	        Message<ModelDeletedEvent> message = MessageBuilder
 	                .withPayload(event)
-	                .setHeader(KafkaHeaders.TOPIC, topic.name()).build();
+	                .setHeader(KafkaHeaders.TOPIC,"inventory-model-deleted").build();
 
 	        kafkaTemplate.send(message);
 	    }
@@ -104,7 +104,7 @@ public class InventoryProducer {
 
 		        Message<RentalCreatedEvent> message = MessageBuilder
 		                .withPayload(event)
-		                .setHeader(KafkaHeaders.TOPIC, topic.name()).build();
+		                .setHeader(KafkaHeaders.TOPIC, "inventory-rental-created").build();
 
 		        kafkaTemplate.send(message);
 		}
@@ -113,7 +113,7 @@ public class InventoryProducer {
 
 		        Message<CarRentalDeletedEvent> message = MessageBuilder
 		                .withPayload(event)
-		                .setHeader(KafkaHeaders.TOPIC, topic.name()).build();
+		                .setHeader(KafkaHeaders.TOPIC, "inventory-rental-deleted").build();
 
 		        kafkaTemplate.send(message);
 		    }

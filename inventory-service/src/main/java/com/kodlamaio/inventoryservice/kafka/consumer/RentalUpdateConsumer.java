@@ -14,7 +14,7 @@ public class RentalUpdateConsumer {
 	   CarService carService;
 
 	    @KafkaListener(
-	            topics = "${spring.kafka.topic.name}"
+	            topics = "rental-updated"
 	            ,groupId = "rental-update"
 	    )
 	    

@@ -3,6 +3,7 @@ package com.kodlamaio.inventoryservice.kafka.consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
 import com.kodlamaio.common.events.rental.RentalCreatedEvent;
@@ -19,11 +20,11 @@ public class RentalCreateConsumer {
 	   CarService carService;
 
 	    @KafkaListener(
-	            topics = "${spring.kafka.topic.name}"
+	            topics = "rental-created"
 	            ,groupId = "rental-create"
 	    )   
 	    
-	    public void consume(RentalCreatedEvent event){
+	    public void consume(@Payload RentalCreatedEvent event){
 	        LOGGER.info(String.format("Order event received in stock service => %s", event.toString()));
 
 	        carService.changeCarState(event.getCarId());
